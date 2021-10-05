@@ -1,6 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet, Button, Text, Alert } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Button,
+  Text,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { Card, NumberDisplay } from "../components";
+import { NormalButton } from "../components/NormalButton";
+import { AntDesign } from "@expo/vector-icons";
 
 const generateRandomNumber = (min, max, exclude) => {
   min = Math.floor(min);
@@ -11,20 +20,18 @@ const generateRandomNumber = (min, max, exclude) => {
 };
 
 export const GameScreen = ({ selectedNumber, setTrials }) => {
-  const [currentGuess, setCurrentGuess] = useState(
-    generateRandomNumber(1, 100, selectedNumber)
-  );
-  const [rounds, setRounds] = useState(0);
+  const intialGuess = generateRandomNumber(1, 100, selectedNumber);
+  const [currentGuess, setCurrentGuess] = useState(intialGuess);
+  const [rounds, setRounds] = useState([intialGuess]);
 
   const currentMin = useRef(1);
   const currentMax = useRef(100);
 
   useEffect(() => {
-    if (selectedNumber == currentGuess) setTrials(rounds);
+    if (selectedNumber == currentGuess) setTrials(rounds.length);
   }, [currentGuess]);
 
   const preditNumber = (direction) => {
-    setRounds(() => rounds + 1);
     if (
       (direction === "lower" && currentGuess <= selectedNumber) ||
       (direction === "upper" && currentGuess >= selectedNumber)
@@ -35,7 +42,7 @@ export const GameScreen = ({ selectedNumber, setTrials }) => {
       return;
     }
     if (direction === "lower") currentMax.current = currentGuess;
-    else currentMin.current = currentGuess;
+    else currentMin.current = currentGuess + 1;
 
     const nextGuess = generateRandomNumber(
       currentMin.current,
@@ -43,6 +50,8 @@ export const GameScreen = ({ selectedNumber, setTrials }) => {
       currentGuess
     );
     setCurrentGuess(nextGuess);
+    setRounds((rounds) => [nextGuess, ...rounds]);
+    console.log(rounds);
   };
 
   return (
@@ -51,12 +60,23 @@ export const GameScreen = ({ selectedNumber, setTrials }) => {
       <NumberDisplay style={styles.number}>{currentGuess}</NumberDisplay>
       <Card style={styles.buttonContainer}>
         <View style={styles.button}>
-          <Button title="Lower" onPress={preditNumber.bind(this, "lower")} />
+          <NormalButton onPress={preditNumber.bind(this, "lower")}>
+            <AntDesign name="downcircle" size={48} color="white" />
+          </NormalButton>
         </View>
         <View style={styles.button}>
-          <Button title="Higher" onPress={preditNumber.bind(this, "upper")} />
+          <NormalButton onPress={preditNumber.bind(this, "upper")}>
+            <AntDesign name="upcircle" size={48} color="white" />
+          </NormalButton>
         </View>
       </Card>
+      <ScrollView>
+        {rounds.map((round, i) => (
+          <View id={i}>
+            <Text>{round}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -68,7 +88,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     // flex: 1,
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
     alignItems: "center",
     width: "95%",
   },

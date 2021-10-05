@@ -3,3 +3,4 @@ export { Card } from "./Card";
 export { Input } from "./Input";
 export { NumberDisplay } from "./NumberDisplay";
 export { CustomButton } from "./CustomButton";
+export { NormalButton } from "./NormalButton";
