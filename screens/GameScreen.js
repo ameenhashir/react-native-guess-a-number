@@ -2,14 +2,15 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   StyleSheet,
-  Button,
   Text,
   Alert,
   ScrollView,
+  Keyboard,
 } from "react-native";
 import { Card, NumberDisplay } from "../components";
 import { NormalButton } from "../components/NormalButton";
 import { AntDesign } from "@expo/vector-icons";
+import Color from "../constants/color";
 
 const generateRandomNumber = (min, max, exclude) => {
   min = Math.floor(min);
@@ -51,7 +52,8 @@ export const GameScreen = ({ selectedNumber, setTrials }) => {
     );
     setCurrentGuess(nextGuess);
     setRounds((rounds) => [nextGuess, ...rounds]);
-    console.log(rounds);
+    // console.log(rounds);
+    Keyboard.dismiss();
   };
 
   return (
@@ -70,10 +72,11 @@ export const GameScreen = ({ selectedNumber, setTrials }) => {
           </NormalButton>
         </View>
       </Card>
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
         {rounds.map((round, i) => (
-          <View id={i}>
-            <Text>{round}</Text>
+          <View key={i} style={styles.content}>
+            <Text style={styles.text}>#{rounds.length - i}</Text>
+            <Text style={styles.text}>{round}</Text>
           </View>
         ))}
       </ScrollView>
@@ -83,6 +86,7 @@ export const GameScreen = ({ selectedNumber, setTrials }) => {
 
 const styles = StyleSheet.create({
   mainView: {
+    flex: 1,
     alignItems: "center",
   },
   buttonContainer: {
@@ -96,5 +100,29 @@ const styles = StyleSheet.create({
     width: "40%",
     padding: 10,
   },
-  number: {},
+  listCointainer: {
+    //flex: 1,
+    width: "80%",
+  },
+  content: {
+    paddingVertical: 20,
+    marginVertical: 5,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    elevation: 3,
+    backgroundColor: "#ccc",
+    borderRadius: 10,
+    width: "60%",
+  },
+  text: { fontSize: 20, color: "white", fontWeight: "bold" },
+  textMain: {
+    backgroundColor: Color.secondary,
+    padding: 10,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
 });
