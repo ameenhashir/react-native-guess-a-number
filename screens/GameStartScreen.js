@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  Dimensions,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Card, CustomButton } from "../components";
 import Color from "../constants/color";
@@ -18,6 +21,19 @@ export const GameStartScreen = ({ getChosenNumber }) => {
   const [enteredNumber, setEnteredNumber] = useState("");
   const [selectedNumber, setSelectedNumber] = useState();
   const [confirmed, setConfirmed] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(
+    Dimensions.get("window").width / 4
+  );
+
+  useEffect(() => {
+    const updateWidth = () => {
+      setScreenWidth(Dimensions.get("window").width / 4);
+    };
+    Dimensions.addEventListener("change", updateWidth);
+    return () => {
+      Dimensions.removeEventListener("change", updateWidth);
+    };
+  });
 
   const onChangeText = (inputText) => {
     setEnteredNumber(inputText.replace(/[^0-9]/g, ""));
@@ -39,6 +55,7 @@ export const GameStartScreen = ({ getChosenNumber }) => {
     setConfirmed(true);
     setSelectedNumber(chosenNumber);
     setEnteredNumber("");
+    Keyboard.dismiss();
   };
 
   var ChosenNumberText;
@@ -54,41 +71,45 @@ export const GameStartScreen = ({ getChosenNumber }) => {
     );
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.screen}>
-        <Text style={styles.title}>The Game Screen</Text>
-        <Card style={styles.inputContainer}>
-          <Text>Enter a Number</Text>
-          <Input
-            style={styles.input}
-            autoCapitalize="none"
-            autoCorrect={false}
-            blurOnSumit
-            maxLength={2}
-            keyboardType="number-pad"
-            value={enteredNumber}
-            onChangeText={onChangeText}
-          />
-          <View style={styles.buttoncontainer}>
-            <View style={styles.button}>
-              <Button
-                title="Reset"
-                onPress={resetButtonHandler}
-                color={Color.secondary}
+    <ScrollView>
+      <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={100}>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+          <View style={styles.screen}>
+            <Text style={styles.title}>The Game Screen</Text>
+            <Card style={styles.inputContainer}>
+              <Text>Enter a Number</Text>
+              <Input
+                style={styles.input}
+                autoCapitalize="none"
+                autoCorrect={false}
+                blurOnSumit
+                maxLength={2}
+                keyboardType="number-pad"
+                value={enteredNumber}
+                onChangeText={onChangeText}
               />
-            </View>
-            <View style={styles.button}>
-              <Button
-                title="Confirm"
-                onPress={confirmButtonHandler}
-                color={Color.primary}
-              />
-            </View>
+              <View style={styles.buttoncontainer}>
+                <View style={{ width: screenWidth }}>
+                  <Button
+                    title="Reset"
+                    onPress={resetButtonHandler}
+                    color={Color.secondary}
+                  />
+                </View>
+                <View style={{ width: screenWidth }}>
+                  <Button
+                    title="Confirm"
+                    onPress={confirmButtonHandler}
+                    color={Color.primary}
+                  />
+                </View>
+              </View>
+            </Card>
+            {ChosenNumberText}
           </View>
-        </Card>
-        {ChosenNumberText}
-      </View>
-    </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 };
 
